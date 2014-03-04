@@ -38,6 +38,17 @@ namespace UnityVMFLoader.Nodes
 
 					break;
 
+				case "pitch":
+
+					var pitch = -float.Parse(value);
+
+					if (pitch != 0)
+					{
+						Angles.eulerAngles = new Vector3(pitch, Angles.eulerAngles.y, Angles.eulerAngles.z);
+					}
+
+					break;
+
 				case "origin":
 
 					var origin = value.Split(' ').Select(v => float.Parse(v)).ToArray();
