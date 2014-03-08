@@ -31,6 +31,11 @@ namespace UnityVMFLoader.Tasks
 			}
 		}
 
+		private string AbsolutePathToRelative(string parent, string child)
+		{
+			return (new Uri(parent).MakeRelativeUri(new Uri(child))).ToString();
+		}
+
 		public override void Run()
 		{
 			var solids = Importer.GetTask<ImportBrushesTask>().Solids;
@@ -54,35 +59,37 @@ namespace UnityVMFLoader.Tasks
 				return;
 			}
 
-			foreach (var material in materials)
+			foreach (var materialName in materials)
 			{
-				var materialFullPath = Path.Combine(SourcePath, material + ".vmt");
+				var materialFullPath = Path.Combine(SourcePath, materialName + ".vmt");
 
 				if (!File.Exists(materialFullPath))
 				{
-					Debug.LogWarning(String.Format("Material \"{0}\" not found.", material));
+					Debug.LogWarning(String.Format("Material \"{0}\" not found.", materialName));
 
 					continue;
 				}
 
-				var materialFile = File.ReadAllText(Path.Combine(SourcePath, material + ".vmt"));
+				var materialFile = File.ReadAllText(Path.Combine(SourcePath, materialName + ".vmt"));
 
-				var regex = new Regex("\"?\\$basetexture\"?\\s+\"?([^\"]*)\"?", RegexOptions.IgnoreCase);
+				// Grab the $basetexture and import that.
 
-				var match = regex.Match(materialFile);
+				var baseTextureRegex = new Regex("\"?\\$basetexture\"?\\s+\"?([^\"]*)\"?", RegexOptions.IgnoreCase);
+
+				var match = baseTextureRegex.Match(materialFile);
 
 				if (!match.Success)
 				{
-					Debug.LogWarning(String.Format("Can't find $basetexture in material \"{0}\".", material));
+					Debug.LogWarning(String.Format("Can't find $basetexture in material \"{0}\".", materialName));
 
 					continue;
 				}
 
-				var texture = match.Groups[1].Value;
+				var textureName = match.Groups[1].Value;
 
-				var textureFullPath = Path.Combine(SourcePath, texture + ".vtf");
+				var textureFullPath = Path.Combine(SourcePath, textureName + ".vtf");
 
-				var destinationFullPath = Path.Combine(DestinationPath, texture + ".tga");
+				var destinationFullPath = Path.Combine(DestinationPath, textureName + ".tga");
 
 				var directory = Path.GetDirectoryName(destinationFullPath);
 
@@ -107,10 +114,38 @@ namespace UnityVMFLoader.Tasks
 
 				while (!process.StandardError.EndOfStream)
 				{
-					string line = process.StandardError.ReadLine();
-
-					Debug.LogWarning(line);
+					Debug.LogWarning(process.StandardError.ReadLine());
 				}
+
+				while (!process.HasExited) {}
+
+				AssetDatabase.Refresh();
+
+				Importer.OnFinished += (caller, e) =>
+				{
+					UnityThreadHelper.Dispatcher.Dispatch
+					(
+						() =>
+						{
+							var material = new Material(Shader.Find("Diffuse"));
+
+							var texturePath = AbsolutePathToRelative(Application.dataPath, destinationFullPath);
+
+							var texture = (Texture2D) AssetDatabase.LoadAssetAtPath(texturePath, typeof(Texture2D));
+
+							if (texture == null)
+							{
+								Debug.LogWarning(String.Format("Couldn't find texture \"{0}\".", texturePath));
+							}
+							else
+							{
+								material.mainTexture = texture;
+
+								AssetDatabase.CreateAsset(material, texturePath.Replace(".tga", ".mat"));
+							}
+						}
+					);
+				};
 			}
 
 			base.Run();

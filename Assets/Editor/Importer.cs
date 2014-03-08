@@ -10,6 +10,8 @@ namespace UnityVMFLoader
 	{
 		public static List<string> VMFLines;
 
+		public static event EventHandler OnFinished;
+
 		private static List<Task> tasks;
 		private static readonly List<Task> doneTasks;
 
@@ -41,6 +43,8 @@ namespace UnityVMFLoader
 
 		public static void Import(string path)
 		{
+			UnityThreadHelper.EnsureHelper();
+
 			VMFLines = File.ReadAllLines(path).Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)).ToList();
 
 			var taskCount = tasks.Count(x => x.CanRun);
@@ -65,10 +69,12 @@ namespace UnityVMFLoader
 				tasks = tasks.Where(task => !task.Done).ToList();
 			}
 
+			EditorUtility.ClearProgressBar();
+
+			OnFinished(null, null);
+
 			tasks.Clear();
 			doneTasks.Clear();
-
-			EditorUtility.ClearProgressBar();
 		}
 	}
 }
