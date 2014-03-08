@@ -138,12 +138,16 @@ namespace UnityVMFLoader.Tasks
 
 				AssetDatabase.Refresh();
 
-				Importer.OnFinished += (caller, e) =>
+				EventHandler createMaterialOnFinished;
+
+				createMaterialOnFinished = (caller, e) =>
 				{
 					UnityThreadHelper.Dispatcher.Dispatch
 					(
 						() =>
 						{
+							Importer.OnFinished -= createMaterialOnFinished;
+
 							// Create the material.
 
 							var material = new Material(Shader.Find("Diffuse"));
@@ -165,16 +169,22 @@ namespace UnityVMFLoader.Tasks
 						}
 					);
 				};
+
+				Importer.OnFinished += createMaterialOnFinished;
 			}
 
 			var gameObjects = Importer.GetTask<CreateBrushObjectsTask>().GameObjects;
 
-			Importer.OnFinished += (caller, e) =>
+			EventHandler assignMaterialsOnFinished;
+
+			assignMaterialsOnFinished = (caller, e) =>
 			{
 				UnityThreadHelper.Dispatcher.Dispatch
 				(
 					() =>
 					{
+						Importer.OnFinished -= assignMaterialsOnFinished;
+
 						// Assign the material.
 
 						foreach (var keyvalue in gameObjects)
@@ -221,6 +231,8 @@ namespace UnityVMFLoader.Tasks
 					}
 				);
 			};
+
+			Importer.OnFinished += assignMaterialsOnFinished;
 
 			base.Run();
 		}
