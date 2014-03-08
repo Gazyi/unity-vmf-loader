@@ -16,20 +16,27 @@ namespace UnityVMFLoader.Tasks
 			{
 				var gameObject = new GameObject("Solid " + solid.Identifier);
 
-				gameObject.AddComponent<UnityEngine.MeshRenderer>();
-				gameObject.AddComponent<MeshFilter>();
+				var meshFilter = gameObject.AddComponent<MeshFilter>();
+				var meshRenderer = gameObject.AddComponent<UnityEngine.MeshRenderer>();
 
-				gameObject.GetComponent<MeshFilter>().sharedMesh = (Mesh) solid;
+				var mesh = (Mesh) solid;
+
+				meshFilter.sharedMesh = mesh;
 
 				// Assign the placeholder material.
 
 				var material = (Material) AssetDatabase.LoadAssetAtPath("Assets/Materials/dev_measuregeneric01b.mat", typeof(Material));
 
-				gameObject.GetComponent<UnityEngine.MeshRenderer>().material = material;
+				var materials = new Material[mesh.subMeshCount];
+
+				for (var i = 0; i < materials.Length; i++)
+				{
+					materials[i] = material;
+				}
+
+				meshRenderer.materials = materials;
 
 				// The vertices of the mesh are in world coordinates so we'll need to center them.
-
-				var mesh = gameObject.GetComponent<MeshFilter>().sharedMesh;
 
 				var center = mesh.vertices.Average();
 

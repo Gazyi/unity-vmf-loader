@@ -71,7 +71,10 @@ namespace UnityVMFLoader
 
 			EditorUtility.ClearProgressBar();
 
-			OnFinished(null, null);
+			if (OnFinished != null)
+			{
+				OnFinished(null, null);
+			}
 
 			tasks.Clear();
 			doneTasks.Clear();
