@@ -46,7 +46,24 @@ namespace UnityVMFLoader.Tasks
 
 			// Narrow it down to those that don't already exist in the assets.
 
-			materials = materials.Where(material => AssetDatabase.LoadAssetAtPath(Path.Combine(DestinationPath, material + ".tga"), typeof(Texture)) == null).ToList();
+			materials = materials.Where
+			(
+				material =>
+
+				AssetDatabase.LoadAssetAtPath
+				(
+					AbsolutePathToRelative
+					(
+						Application.dataPath,
+						Path.Combine(DestinationPath, material + ".tga")
+					),
+
+					typeof(Texture)
+				)
+
+				== null
+			)
+			.ToList();
 
 			// Use vtf2tga to make them into assets.
 
