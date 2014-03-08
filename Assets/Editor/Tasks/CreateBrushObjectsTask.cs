@@ -25,7 +25,7 @@ namespace UnityVMFLoader.Tasks
 
 				// Assign the placeholder material.
 
-				var material = (Material) AssetDatabase.LoadAssetAtPath("Assets/Materials/dev_measuregeneric01b.mat", typeof(Material));
+				var material = (Material) AssetDatabase.LoadAssetAtPath("Assets/Materials/Dev/dev_measuregeneric01b.mat", typeof(Material));
 
 				var materials = new Material[mesh.subMeshCount];
 
