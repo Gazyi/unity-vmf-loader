@@ -15,7 +15,7 @@ namespace UnityVMFLoader.Tasks
 	[DependsOnTask(typeof(CreateBrushObjectsTask))]
 	public class ImportMaterialsTask : Task
 	{
-		private string SourcePath
+		public static string SourcePath
 		{
 			get
 			{
@@ -23,7 +23,7 @@ namespace UnityVMFLoader.Tasks
 			}
 		}
 
-		private string DestinationPath
+		public static string DestinationPath
 		{
 			get
 			{
@@ -31,7 +31,7 @@ namespace UnityVMFLoader.Tasks
 			}
 		}
 
-		private string AbsolutePathToRelative(string parent, string child)
+		public static string AbsolutePathToRelative(string parent, string child)
 		{
 			return (new Uri(parent).MakeRelativeUri(new Uri(child))).ToString();
 		}
@@ -144,6 +144,8 @@ namespace UnityVMFLoader.Tasks
 					(
 						() =>
 						{
+							// Create the material.
+
 							var material = new Material(Shader.Find("Diffuse"));
 
 							var texturePath = AbsolutePathToRelative(Application.dataPath, destinationFullPath);
@@ -164,6 +166,61 @@ namespace UnityVMFLoader.Tasks
 					);
 				};
 			}
+
+			var gameObjects = Importer.GetTask<CreateBrushObjectsTask>().GameObjects;
+
+			Importer.OnFinished += (caller, e) =>
+			{
+				UnityThreadHelper.Dispatcher.Dispatch
+				(
+					() =>
+					{
+						// Assign the material.
+
+						foreach (var keyvalue in gameObjects)
+						{
+							Solid solid = keyvalue.Key;
+							GameObject gameObject = keyvalue.Value;
+
+							if (gameObject == null)
+							{
+								Debug.LogWarning("Tried to assign a material to a solid with a null GameObject!");
+
+								continue;
+							}
+
+							var meshFilter = gameObject.GetComponent<MeshFilter>();
+							var meshRenderer = gameObject.GetComponent<UnityEngine.MeshRenderer>();
+
+							var mesh = meshFilter.sharedMesh;
+
+							var meshMaterials = new Material[mesh.subMeshCount];
+
+							var i = 0;
+
+							foreach (var side in solid.Children.OfType<Side>())
+							{
+								var path = ImportMaterialsTask.AbsolutePathToRelative
+								(
+									Application.dataPath,
+									Path.Combine(ImportMaterialsTask.DestinationPath, side.Material + ".mat")
+								);
+
+								var sideMaterial = (Material) AssetDatabase.LoadAssetAtPath(path, typeof(Material));
+
+								if (sideMaterial == null)
+								{
+									Debug.LogWarning("Can't find material \"" + path + "\" for a side.");
+								}
+
+								meshMaterials[i++] = sideMaterial;
+							}
+
+							meshRenderer.sharedMaterials = meshMaterials;
+						}
+					}
+				);
+			};
 
 			base.Run();
 		}

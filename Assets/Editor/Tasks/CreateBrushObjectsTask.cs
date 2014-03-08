@@ -1,12 +1,17 @@
 using System.Linq;
+using System.IO;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityVMFLoader.Nodes;
 
 namespace UnityVMFLoader.Tasks
 {
 	[DependsOnTask(typeof(ImportBrushesTask), typeof(GroupNodesTask))]
 	public class CreateBrushObjectsTask : Task
 	{
+		public Dictionary<Solid, GameObject> GameObjects = new Dictionary<Solid, GameObject>();
+
 		public override void Run()
 		{
 			var solids = Importer.GetTask<ImportBrushesTask>().Solids;
@@ -14,27 +19,12 @@ namespace UnityVMFLoader.Tasks
 
 			foreach (var solid in solids)
 			{
-				var gameObject = new GameObject("Solid " + solid.Identifier);
-
-				var meshFilter = gameObject.AddComponent<MeshFilter>();
-				var meshRenderer = gameObject.AddComponent<UnityEngine.MeshRenderer>();
-
 				var mesh = (Mesh) solid;
 
-				meshFilter.sharedMesh = mesh;
+				var gameObject = new GameObject("Solid " + solid.Identifier);
 
-				// Assign the placeholder material.
-
-				var material = (Material) AssetDatabase.LoadAssetAtPath("Assets/Materials/Dev/dev_measuregeneric01b.mat", typeof(Material));
-
-				var materials = new Material[mesh.subMeshCount];
-
-				for (var i = 0; i < materials.Length; i++)
-				{
-					materials[i] = material;
-				}
-
-				meshRenderer.materials = materials;
+				gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
+				gameObject.AddComponent<UnityEngine.MeshRenderer>();
 
 				// The vertices of the mesh are in world coordinates so we'll need to center them.
 
@@ -78,6 +68,8 @@ namespace UnityVMFLoader.Tasks
 						gameObject.transform.parent = pair.Value.transform;
 					}
 				}
+
+				GameObjects[solid] = gameObject;
 			}
 
 			base.Run();
