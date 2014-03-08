@@ -23,8 +23,22 @@ namespace UnityVMFLoader.Tasks
 
 				var gameObject = new GameObject("Solid " + solid.Identifier);
 
+				GameObjects[solid] = gameObject;
+
 				gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
-				gameObject.AddComponent<UnityEngine.MeshRenderer>();
+
+				var meshRenderer = gameObject.AddComponent<UnityEngine.MeshRenderer>();
+
+				// Assign the placeholder material.
+
+				var meshMaterials = new Material[mesh.subMeshCount];
+
+				for (var i = 0; i < meshMaterials.Length; i++)
+				{
+					meshMaterials[i] = (Material) AssetDatabase.LoadAssetAtPath("Assets/Materials/Dev/dev_measuregeneric01b.mat", typeof(Material));
+				}
+
+				meshRenderer.sharedMaterials = meshMaterials;
 
 				// The vertices of the mesh are in world coordinates so we'll need to center them.
 
@@ -68,8 +82,6 @@ namespace UnityVMFLoader.Tasks
 						gameObject.transform.parent = pair.Value.transform;
 					}
 				}
-
-				GameObjects[solid] = gameObject;
 			}
 
 			base.Run();
