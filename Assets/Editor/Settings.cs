@@ -7,33 +7,125 @@ namespace UnityVMFLoader
 {
 	class Settings : EditorWindow
 	{
-		public static bool ImportDisplacements = false;
+		public static bool ImportDisplacements
+		{
+			get { return EditorPrefs.GetBool("UnityVMFLoader.ImportDisplacements"); }
+			set { EditorPrefs.SetBool("UnityVMFLoader.ImportDisplacements", value); }
+		}
 
-		public static bool ImportBrushes = true;
-		public static bool ImportWorldBrushes = true;
-		public static bool ImportDetailBrushes = true;
-		public static bool GenerateLightmapUVs = true;
+		public static bool ImportBrushes
+		{
+			get { return EditorPrefs.GetBool("UnityVMFLoader.ImportBrushes", true); }
+			set { EditorPrefs.SetBool("UnityVMFLoader.ImportBrushes", value); }
+		}
 
-		public static bool ImportPointEntities = true;
-		public static bool ImportLights = true;
-		public static float LightBrightnessScalar = 0.005f;
+		public static bool ImportWorldBrushes
+		{
+			get { return EditorPrefs.GetBool("UnityVMFLoader.ImportWorldBrushes", true); }
+			set { EditorPrefs.SetBool("UnityVMFLoader.ImportWorldBrushes", value); }
+		}
 
-		public static bool ImportAssets = true;
-		public static bool ImportMaterials = true;
-		public static bool ImportModels = false;
-		public static bool ImportSounds = false;
+		public static bool ImportDetailBrushes
+		{
+			get { return EditorPrefs.GetBool("UnityVMFLoader.ImportDetailBrushes", true); }
+			set { EditorPrefs.SetBool("UnityVMFLoader.ImportDetailBrushes", value); }
+		}
 
-		public static string AssetPath = "";
-		public static string DestinationAssetPath = "";
+		public static bool GenerateLightmapUVs
+		{
+			get { return EditorPrefs.GetBool("UnityVMFLoader.GenerateLightmapUVs", true); }
+			set { EditorPrefs.SetBool("UnityVMFLoader.GenerateLightmapUVs", value); }
+		}
 
-		public static string MaterialsFolder = "materials";
-		public static string DestinationMaterialsFolder = "Materials";
+		public static bool ImportPointEntities
+		{
+			get { return EditorPrefs.GetBool("UnityVMFLoader.ImportPointEntities", true); }
+			set { EditorPrefs.SetBool("UnityVMFLoader.ImportPointEntities", value); }
+		}
 
-		public static string ModelsFolder = "models";
-		public static string DestinationModelsFolder = "Models";
+		public static bool ImportLights
+		{
+			get { return EditorPrefs.GetBool("UnityVMFLoader.ImportLights", true); }
+			set { EditorPrefs.SetBool("UnityVMFLoader.ImportLights", value); }
+		}
 
-		public static string SoundsFolder = "sound";
-		public static string DestinationSoundsFolder = "Sounds";
+		public static float LightBrightnessScalar
+		{
+			get { return EditorPrefs.GetFloat("UnityVMFLoader.LightBrightnessScalar", 0.005f); }
+			set { EditorPrefs.SetFloat("UnityVMFLoader.LightBrightnessScalar", value); }
+		}
+
+		public static bool ImportAssets
+		{
+			get { return EditorPrefs.GetBool("UnityVMFLoader.ImportAssets", true); }
+			set { EditorPrefs.SetBool("UnityVMFLoader.ImportAssets", value); }
+		}
+
+		public static bool ImportMaterials
+		{
+			get { return EditorPrefs.GetBool("UnityVMFLoader.ImportMaterials", true); }
+			set { EditorPrefs.SetBool("UnityVMFLoader.ImportMaterials", value); }
+		}
+
+		public static bool ImportModels
+		{
+			get { return EditorPrefs.GetBool("UnityVMFLoader.ImportModels"); }
+			set { EditorPrefs.SetBool("UnityVMFLoader.ImportModels", value); }
+		}
+
+		public static bool ImportSounds
+		{
+			get { return EditorPrefs.GetBool("UnityVMFLoader.ImportSounds"); }
+			set { EditorPrefs.SetBool("UnityVMFLoader.ImportSounds", value); }
+		}
+
+		public static string AssetPath
+		{
+			get { return EditorPrefs.GetString("UnityVMFLoader.AssetPath"); }
+			set { EditorPrefs.SetString("UnityVMFLoader.AssetPath", value); }
+		}
+
+		public static string DestinationAssetPath
+		{
+			get { return EditorPrefs.GetString("UnityVMFLoader.DestinationAssetPath"); }
+			set { EditorPrefs.SetString("UnityVMFLoader.DestinationAssetPath", value); }
+		}
+
+		public static string MaterialsFolder
+		{
+			get { return EditorPrefs.GetString("UnityVMFLoader.MaterialsFolder", "materials"); }
+			set { EditorPrefs.SetString("UnityVMFLoader.MaterialsFolder", value); }
+		}
+
+		public static string DestinationMaterialsFolder
+		{
+			get { return EditorPrefs.GetString("UnityVMFLoader.DestinationMaterialsFolder", "Materials"); }
+			set { EditorPrefs.SetString("UnityVMFLoader.DestinationMaterialsFolder", value); }
+		}
+
+		public static string ModelsFolder
+		{
+			get { return EditorPrefs.GetString("UnityVMFLoader.ModelsFolder", "models"); }
+			set { EditorPrefs.SetString("UnityVMFLoader.ModelsFolder", value); }
+		}
+
+		public static string DestinationModelsFolder
+		{
+			get { return EditorPrefs.GetString("UnityVMFLoader.DestinationModelsFolder", "Models"); }
+			set { EditorPrefs.SetString("UnityVMFLoader.DestinationModelsFolder", value); }
+		}
+
+		public static string SoundsFolder
+		{
+			get { return EditorPrefs.GetString("UnityVMFLoader.SoundsFolder", "sound"); }
+			set { EditorPrefs.SetString("UnityVMFLoader.SoundsFolder", value); }
+		}
+
+		public static string DestinationSoundsFolder
+		{
+			get { return EditorPrefs.GetString("UnityVMFLoader.DestinationSoundsFolder", "Sounds"); }
+			set { EditorPrefs.SetString("UnityVMFLoader.DestinationSoundsFolder", value); }
+		}
 
 		public void OnGUI()
 		{
