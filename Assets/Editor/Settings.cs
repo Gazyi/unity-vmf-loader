@@ -191,7 +191,21 @@ namespace UnityVMFLoader
 
 			EditorGUILayout.Space();
 
+			GUILayout.BeginHorizontal();
+
 			AssetPath = EditorGUILayout.TextField("Asset path", AssetPath);
+
+			if (GUILayout.Button("Browse"))
+			{
+				var path = EditorUtility.OpenFolderPanel("Asset path", "", "");
+
+				if (path.Length > 0)
+				{
+					AssetPath = path;
+				}
+			}
+
+			GUILayout.EndHorizontal();
 
 			MaterialsFolder = EditorGUILayout.TextField("Materials folder", MaterialsFolder);
 
