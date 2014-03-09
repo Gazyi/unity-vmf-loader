@@ -270,27 +270,6 @@ namespace UnityVMFLoader.Nodes
 
 			intersections2D = output.Vertices.Select(vertex => new Vector3((float) vertex.X, (float) vertex.Y, 0)).ToList();
 
-			// Calculate texture coordinates.
-
-			var textureCoordinates = new Vector2[output.Vertices.Count()];
-
-			var i = 0;
-
-			foreach (var point in intersections)
-			{
-				// HACK: Hardcoded for now, fetch them later when we have proper texturing support.
-
-				const float texWidth = 128;
-				const float texHeight = 128;
-
-				var u = ((Vector3.Dot(point, side.UAxis) / (texWidth * side.UAxisScale)) + (side.UAxisTranslation / texWidth));
-				var v = ((Vector3.Dot(point, side.VAxis) / (texHeight * side.VAxisScale)) + (side.VAxisTranslation / texHeight));
-
-				textureCoordinates[i] = new Vector2(u, v);
-
-				i++;
-			}
-
 			// Transform the triangulated polygon back to 3D.
 
 			intersections = intersections2D.Select(point => Quaternion.AngleAxis(-angle, axis) * point + side.Center).ToList();
@@ -301,7 +280,6 @@ namespace UnityVMFLoader.Nodes
 
 			mesh.vertices = intersections.ToArray();
 			mesh.triangles = renderableOutput.Triangles.Select(x => (int) x).ToArray();
-			mesh.uv = textureCoordinates;
 
 			mesh.RecalculateNormals();
 			mesh.RecalculateBounds();

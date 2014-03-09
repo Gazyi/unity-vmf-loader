@@ -185,8 +185,6 @@ namespace UnityVMFLoader.Tasks
 					{
 						Importer.OnFinished -= assignMaterialsOnFinished;
 
-						// Assign the material.
-
 						foreach (var keyvalue in gameObjects)
 						{
 							Solid solid = keyvalue.Key;
@@ -205,11 +203,14 @@ namespace UnityVMFLoader.Tasks
 							var mesh = meshFilter.sharedMesh;
 
 							var meshMaterials = new Material[mesh.subMeshCount];
+							var textureCoordinates = new Vector2[mesh.vertices.Length];
 
-							var i = 0;
+							var submesh = 0;
 
 							foreach (var side in solid.Children.OfType<Side>())
 							{
+								// Assign the material.
+
 								var path = ImportMaterialsTask.AbsolutePathToRelative
 								(
 									Application.dataPath,
@@ -221,12 +222,31 @@ namespace UnityVMFLoader.Tasks
 								if (sideMaterial == null)
 								{
 									Debug.LogWarning("Can't find material \"" + path + "\" for a side.");
+
+									continue;
 								}
 
-								meshMaterials[i++] = sideMaterial;
+								meshMaterials[submesh] = sideMaterial;
+
+								// Calculate texture coordinates.
+
+								var texture = sideMaterial.mainTexture;
+
+								foreach (var index in mesh.GetIndices(submesh))
+								{
+									var vertex = mesh.vertices[index];
+
+									var u = ((Vector3.Dot(vertex, side.UAxis) / (texture.width * side.UAxisScale)) + (side.UAxisTranslation / texture.width));
+									var v = ((Vector3.Dot(vertex, side.VAxis) / (texture.height * side.VAxisScale)) + (side.VAxisTranslation / texture.height));
+
+									textureCoordinates[index] = new Vector2(u, v);
+								}
+
+								submesh++;
 							}
 
 							meshRenderer.sharedMaterials = meshMaterials;
+							mesh.uv = textureCoordinates;
 						}
 					}
 				);
