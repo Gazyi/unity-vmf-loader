@@ -228,18 +228,33 @@ namespace UnityVMFLoader.Tasks
 
 								meshMaterials[submesh] = sideMaterial;
 
-								// Calculate texture coordinates.
+								// Minimize shift values.
 
 								var texture = sideMaterial.mainTexture;
 
+								side.UAxisTranslation = side.UAxisTranslation % texture.width;
+								side.VAxisTranslation = side.VAxisTranslation % texture.height;
+
+								if (side.UAxisTranslation < -texture.width / 2f)
+								{
+									side.UAxisTranslation += texture.width;
+								}
+
+								if (side.VAxisTranslation < -texture.height / 2f)
+								{
+									side.VAxisTranslation += texture.height;
+								}
+
+								// Calculate texture coordinates.
+
 								foreach (var index in mesh.GetIndices(submesh))
 								{
-									var vertex = mesh.vertices[index];
+									var vertex = gameObject.transform.position + mesh.vertices[index];
 
-									var u = ((Vector3.Dot(vertex, side.UAxis) / (texture.width * side.UAxisScale)) + (side.UAxisTranslation / texture.width));
-									var v = ((Vector3.Dot(vertex, side.VAxis) / (texture.height * side.VAxisScale)) + (side.VAxisTranslation / texture.height));
+									var u = Vector3.Dot(vertex, side.UAxis) / (texture.width * side.UAxisScale) + side.UAxisTranslation / texture.width;
+									var v = Vector3.Dot(vertex, side.VAxis) / (texture.height * side.VAxisScale) + side.VAxisTranslation / texture.height;
 
-									textureCoordinates[index] = new Vector2(u, v);
+									textureCoordinates[index] = new Vector2(u, -v);
 								}
 
 								submesh++;
