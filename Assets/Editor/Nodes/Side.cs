@@ -132,6 +132,11 @@ namespace UnityVMFLoader.Nodes
 
 					match = uvRegex.Match(value);
 
+					if (!match.Success)
+					{
+						throw new Exception("Failed to match 'uaxis' on side " + Identifier + ".");
+					}
+
 					UAxis = new Vector3
 					(
 						float.Parse(match.Groups[1].Value),
@@ -147,6 +152,11 @@ namespace UnityVMFLoader.Nodes
 				case "vaxis":
 
 					match = uvRegex.Match(value);
+
+					if (!match.Success)
+					{
+						throw new Exception("Failed to match 'vaxis' on side " + Identifier + ".");
+					}
 
 					VAxis = new Vector3
 					(
