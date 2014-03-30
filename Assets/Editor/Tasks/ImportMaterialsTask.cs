@@ -148,9 +148,13 @@ namespace UnityVMFLoader.Tasks
 						{
 							Importer.OnFinished -= createMaterialOnFinished;
 
+							var translucentRegex = new Regex("\"?\\$(?:translucent|alphatest)\"?\\s+\"?([^\"]*)\"?", RegexOptions.IgnoreCase);
+							var translucentMatch = translucentRegex.Match(materialFile);
+							var translucent = translucentMatch.Success && translucentMatch.Groups[1].Value[0] == '1';
+
 							// Create the material.
 
-							var material = new Material(Shader.Find("Diffuse"));
+							var material = new Material(Shader.Find(translucent ? "Transparent/Diffuse" : "Diffuse"));
 
 							var texturePath = AbsolutePathToRelative(Application.dataPath, destinationFullPath);
 
