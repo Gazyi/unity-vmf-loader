@@ -19,7 +19,7 @@ namespace UnityVMFLoader.Tasks
 		{
 			get
 			{
-				return Path.Combine(Path.Combine("Assets", Settings.AssetPath), Settings.MaterialsFolder);
+				return Path.Combine(Settings.AssetPath, Settings.MaterialsFolder);
 			}
 		}
 
@@ -27,7 +27,7 @@ namespace UnityVMFLoader.Tasks
 		{
 			get
 			{
-				return Path.Combine(Path.Combine(Application.dataPath, Settings.DestinationAssetPath), Settings.DestinationMaterialsFolder);
+				return Path.Combine(Settings.DestinationAssetPath, Settings.DestinationMaterialsFolder);
 			}
 		}
 
@@ -46,26 +46,7 @@ namespace UnityVMFLoader.Tasks
 
 			// Narrow it down to those that don't already exist in the assets.
 
-			materials = materials.Where
-			(
-				material =>
-
-				AssetDatabase.LoadAssetAtPath
-				(
-					AbsolutePathToRelative
-					(
-						Application.dataPath,
-						Path.Combine(DestinationPath, material + ".tga")
-					),
-
-					typeof(Texture)
-				)
-
-				== null
-			)
-			.ToList();
-
-			// Use vtf2tga to make them into assets.
+			materials = materials.Where(x => AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", Path.Combine(DestinationPath, x + ".mat")), typeof(Material)) == null).ToList();
 
 			if (Settings.AssetPath == "")
 			{
@@ -76,8 +57,16 @@ namespace UnityVMFLoader.Tasks
 				return;
 			}
 
-			foreach (var materialName in materials)
+			foreach (var materialNameReference in materials)
 			{
+				/*
+					We need to copy the material name so that we can access it
+					in an event later on. Otherwise it'll just point to the
+					last item in "materials".
+				*/
+
+				var materialName = materialNameReference;
+
 				var materialFullPath = Path.Combine(SourcePath, materialName + ".vmt");
 
 				if (!File.Exists(materialFullPath))
@@ -105,8 +94,7 @@ namespace UnityVMFLoader.Tasks
 				var textureName = match.Groups[1].Value;
 
 				var textureFullPath = Path.Combine(SourcePath, textureName + ".vtf");
-
-				var destinationFullPath = Path.Combine(DestinationPath, textureName + ".tga");
+				var destinationFullPath = Path.Combine(Application.dataPath, Path.Combine(DestinationPath, textureName + ".tga"));
 
 				var directory = Path.GetDirectoryName(destinationFullPath);
 
@@ -168,7 +156,16 @@ namespace UnityVMFLoader.Tasks
 							{
 								material.mainTexture = texture;
 
-								AssetDatabase.CreateAsset(material, texturePath.Replace(".tga", ".mat"));
+								var materialPath = Path.Combine(DestinationPath, materialName + ".mat");
+
+								var materialDirectory = Path.GetDirectoryName(Path.Combine(Application.dataPath, materialPath));
+
+								if (!Directory.Exists(materialDirectory))
+								{
+									Directory.CreateDirectory(materialDirectory);
+								}
+
+								AssetDatabase.CreateAsset(material, Path.Combine("Assets", materialPath));
 							}
 						}
 					);
@@ -215,11 +212,7 @@ namespace UnityVMFLoader.Tasks
 							{
 								// Assign the material.
 
-								var path = ImportMaterialsTask.AbsolutePathToRelative
-								(
-									Application.dataPath,
-									Path.Combine(ImportMaterialsTask.DestinationPath, side.Material + ".mat")
-								);
+								var path = Path.Combine("Assets", Path.Combine(DestinationPath, side.Material + ".mat"));
 
 								var sideMaterial = (Material) AssetDatabase.LoadAssetAtPath(path, typeof(Material));
 
