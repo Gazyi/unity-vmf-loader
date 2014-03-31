@@ -53,127 +53,149 @@ namespace UnityVMFLoader.Tasks
 				Debug.LogWarning("No asset path specified in settings - skipping asset import.");
 
 				base.Run();
+				return;
+			}
+
+			foreach (var material in materials)
+			{
+				CreateTextures(material);
+				CreateMaterials(material);
+			}
+
+			AssignMaterials();
+
+			base.Run();
+		}
+
+		private string GetVMTParameter(string material, string parameter)
+		{
+			var baseTextureRegex = new Regex("\"?\\$" + parameter + "\"?\\s+\"?([^\"]*)\"?", RegexOptions.IgnoreCase);
+
+			var match = baseTextureRegex.Match(File.ReadAllText(material));
+
+			if (!match.Success)
+			{
+				return "";
+			}
+
+			return match.Groups[1].Value;
+		}
+
+		private void CreateTextures(string materialName)
+		{
+			var vmtPath = Path.Combine(SourcePath, materialName + ".vmt");
+
+			if (!File.Exists(vmtPath))
+			{
+				return;
+			}
+
+			var textureName = GetVMTParameter(vmtPath, "basetexture");
+
+			if (String.IsNullOrEmpty(textureName))
+			{
+				Debug.LogWarning("Material \"" + vmtPath + "\" doesn't have a $basetexture.");
 
 				return;
 			}
 
-			foreach (var materialNameReference in materials)
+			var textureFullPath = Path.Combine(SourcePath, textureName + ".vtf");
+			var textureDestinationFullPath = Path.Combine(Application.dataPath, Path.Combine(DestinationPath, textureName + ".tga"));
+			var textureDestinationDirectory = Path.GetDirectoryName(textureDestinationFullPath);
+
+			if (!Directory.Exists(textureDestinationDirectory))
 			{
-				/*
-					We need to copy the material name so that we can access it
-					in an event later on. Otherwise it'll just point to the
-					last item in "materials".
-				*/
-
-				var materialName = materialNameReference;
-
-				var materialFullPath = Path.Combine(SourcePath, materialName + ".vmt");
-
-				if (!File.Exists(materialFullPath))
-				{
-					Debug.LogWarning(String.Format("Material \"{0}\" not found.", materialName));
-
-					continue;
-				}
-
-				var materialFile = File.ReadAllText(Path.Combine(SourcePath, materialName + ".vmt"));
-
-				// Grab the $basetexture and import that.
-
-				var baseTextureRegex = new Regex("\"?\\$basetexture\"?\\s+\"?([^\"]*)\"?", RegexOptions.IgnoreCase);
-
-				var match = baseTextureRegex.Match(materialFile);
-
-				if (!match.Success)
-				{
-					Debug.LogWarning(String.Format("Can't find $basetexture in material \"{0}\".", materialName));
-
-					continue;
-				}
-
-				var textureName = match.Groups[1].Value;
-
-				var textureFullPath = Path.Combine(SourcePath, textureName + ".vtf");
-				var destinationFullPath = Path.Combine(Application.dataPath, Path.Combine(DestinationPath, textureName + ".tga"));
-
-				var directory = Path.GetDirectoryName(destinationFullPath);
-
-				if (!Directory.Exists(directory))
-				{
-					Directory.CreateDirectory(directory);
-				}
-
-				var process = Process.Start
-				(
-					new ProcessStartInfo
-					{
-						CreateNoWindow = true,
-						UseShellExecute = false,
-						RedirectStandardOutput = true,
-						RedirectStandardError = true,
-						FileName = Path.Combine(Application.dataPath, "vtf2tga.exe"),
-						WindowStyle = ProcessWindowStyle.Hidden,
-						Arguments = String.Format("-i \"{0}\" -o \"{1}\"", textureFullPath, destinationFullPath)
-					}
-				);
-
-				while (!process.StandardError.EndOfStream)
-				{
-					Debug.LogWarning(process.StandardError.ReadLine());
-				}
-
-				while (!process.HasExited) {}
-
-				AssetDatabase.Refresh();
-
-				EventHandler createMaterialOnFinished;
-
-				createMaterialOnFinished = (caller, e) =>
-				{
-					UnityThreadHelper.Dispatcher.Dispatch
-					(
-						() =>
-						{
-							Importer.OnFinished -= createMaterialOnFinished;
-
-							var translucentRegex = new Regex("\"?\\$(?:translucent|alphatest)\"?\\s+\"?([^\"]*)\"?", RegexOptions.IgnoreCase);
-							var translucentMatch = translucentRegex.Match(materialFile);
-							var translucent = translucentMatch.Success && translucentMatch.Groups[1].Value[0] == '1';
-
-							// Create the material.
-
-							var material = new Material(Shader.Find(translucent ? "Transparent/Diffuse" : "Diffuse"));
-
-							var texturePath = AbsolutePathToRelative(Application.dataPath, destinationFullPath);
-
-							var texture = (Texture2D) AssetDatabase.LoadAssetAtPath(texturePath, typeof(Texture2D));
-
-							if (texture == null)
-							{
-								Debug.LogWarning(String.Format("Couldn't find texture \"{0}\".", texturePath));
-							}
-							else
-							{
-								material.mainTexture = texture;
-
-								var materialPath = Path.Combine(DestinationPath, materialName + ".mat");
-
-								var materialDirectory = Path.GetDirectoryName(Path.Combine(Application.dataPath, materialPath));
-
-								if (!Directory.Exists(materialDirectory))
-								{
-									Directory.CreateDirectory(materialDirectory);
-								}
-
-								AssetDatabase.CreateAsset(material, Path.Combine("Assets", materialPath));
-							}
-						}
-					);
-				};
-
-				Importer.OnFinished += createMaterialOnFinished;
+				Directory.CreateDirectory(textureDestinationDirectory);
 			}
 
+			var process = Process.Start
+			(
+				new ProcessStartInfo
+				{
+					CreateNoWindow = true,
+					UseShellExecute = false,
+					RedirectStandardOutput = true,
+					RedirectStandardError = true,
+					FileName = Path.Combine(Application.dataPath, "vtf2tga.exe"),
+					WindowStyle = ProcessWindowStyle.Hidden,
+					Arguments = String.Format("-i \"{0}\" -o \"{1}\"", textureFullPath, textureDestinationFullPath)
+				}
+			);
+
+			while (!process.StandardError.EndOfStream)
+			{
+				Debug.LogWarning(process.StandardError.ReadLine());
+			}
+
+			while (!process.HasExited);
+
+			AssetDatabase.Refresh();
+		}
+
+		private void CreateMaterials(string materialName)
+		{
+			var vmtPath = Path.Combine(SourcePath, materialName + ".vmt");
+
+			if (!File.Exists(vmtPath))
+			{
+				return;
+			}
+
+			EventHandler createMaterialOnFinished;
+
+			createMaterialOnFinished = (caller, e) =>
+			{
+				UnityThreadHelper.Dispatcher.Dispatch
+				(
+					() =>
+					{
+						Importer.OnFinished -= createMaterialOnFinished;
+
+						var translucentParameter = GetVMTParameter(vmtPath, "(?:translucent|alphatest)");
+						var baseTextureParameter = GetVMTParameter(vmtPath, "basetexture");
+
+						if (String.IsNullOrEmpty(baseTextureParameter))
+						{
+							Debug.LogWarning("Material \"" + vmtPath + "\" doesn't have a $basetexture.");
+
+							return;
+						}
+
+						var transparent = !String.IsNullOrEmpty(translucentParameter) && translucentParameter[0] == '1';
+
+						var texturePath = Path.Combine("Assets", Path.Combine(DestinationPath, baseTextureParameter + ".tga"));
+						var texture = (Texture2D) AssetDatabase.LoadAssetAtPath(texturePath, typeof(Texture2D));
+
+						if (texture == null)
+						{
+							Debug.LogWarning(String.Format("Couldn't find texture \"{0}\".", texturePath));
+
+							return;
+						}
+
+						var material = new Material(Shader.Find(transparent ? "Transparent/Diffuse" : "Diffuse"));
+
+						material.mainTexture = texture;
+
+						var materialPath = Path.Combine(DestinationPath, materialName + ".mat");
+
+						var materialDirectory = Path.GetDirectoryName(Path.Combine(Application.dataPath, materialPath));
+
+						if (!Directory.Exists(materialDirectory))
+						{
+							Directory.CreateDirectory(materialDirectory);
+						}
+
+						AssetDatabase.CreateAsset(material, Path.Combine("Assets", materialPath));
+					}
+				);
+			};
+
+			Importer.OnFinished += createMaterialOnFinished;
+		}
+
+		private void AssignMaterials()
+		{
 			var gameObjects = Importer.GetTask<CreateBrushObjectsTask>().GameObjects;
 
 			EventHandler assignMaterialsOnFinished;
@@ -265,8 +287,6 @@ namespace UnityVMFLoader.Tasks
 			};
 
 			Importer.OnFinished += assignMaterialsOnFinished;
-
-			base.Run();
 		}
 	}
 }
