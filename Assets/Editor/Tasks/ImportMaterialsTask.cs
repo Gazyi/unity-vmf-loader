@@ -81,24 +81,8 @@ namespace UnityVMFLoader.Tasks
 			return match.Groups[1].Value;
 		}
 
-		private void CreateTextures(string materialName)
+		private void ImportTexture(string textureName)
 		{
-			var vmtPath = Path.Combine(SourcePath, materialName + ".vmt");
-
-			if (!File.Exists(vmtPath))
-			{
-				return;
-			}
-
-			var textureName = GetVMTParameter(vmtPath, "basetexture");
-
-			if (String.IsNullOrEmpty(textureName))
-			{
-				Debug.LogWarning("Material \"" + vmtPath + "\" doesn't have a $basetexture.");
-
-				return;
-			}
-
 			var textureFullPath = Path.Combine(SourcePath, textureName + ".vtf");
 			var textureDestinationFullPath = Path.Combine(Application.dataPath, Path.Combine(DestinationPath, textureName + ".tga"));
 			var textureDestinationDirectory = Path.GetDirectoryName(textureDestinationFullPath);
@@ -132,6 +116,29 @@ namespace UnityVMFLoader.Tasks
 			AssetDatabase.Refresh();
 		}
 
+		private void CreateTextures(string materialName)
+		{
+			var vmtPath = Path.Combine(SourcePath, materialName + ".vmt");
+
+			if (!File.Exists(vmtPath))
+			{
+				return;
+			}
+
+			var baseTextureParameter = GetVMTParameter(vmtPath, "basetexture");
+			var bumpMapParameter = GetVMTParameter(vmtPath, "bumpmap");
+
+			if (String.IsNullOrEmpty(baseTextureParameter))
+			{
+				Debug.LogWarning("Material \"" + vmtPath + "\" doesn't have a $basetexture.");
+
+				return;
+			}
+
+			ImportTexture(baseTextureParameter);
+			ImportTexture(bumpMapParameter);
+		}
+
 		private void CreateMaterials(string materialName)
 		{
 			var vmtPath = Path.Combine(SourcePath, materialName + ".vmt");
@@ -153,6 +160,7 @@ namespace UnityVMFLoader.Tasks
 
 						var translucentParameter = GetVMTParameter(vmtPath, "(?:translucent|alphatest)");
 						var baseTextureParameter = GetVMTParameter(vmtPath, "basetexture");
+						var bumpMapParameter = GetVMTParameter(vmtPath, "bumpmap");
 
 						if (String.IsNullOrEmpty(baseTextureParameter))
 						{
@@ -160,8 +168,6 @@ namespace UnityVMFLoader.Tasks
 
 							return;
 						}
-
-						var transparent = !String.IsNullOrEmpty(translucentParameter) && translucentParameter[0] == '1';
 
 						var texturePath = Path.Combine("Assets", Path.Combine(DestinationPath, baseTextureParameter + ".tga"));
 						var texture = (Texture2D) AssetDatabase.LoadAssetAtPath(texturePath, typeof(Texture2D));
@@ -173,9 +179,42 @@ namespace UnityVMFLoader.Tasks
 							return;
 						}
 
-						var material = new Material(Shader.Find(transparent ? "Transparent/Diffuse" : "Diffuse"));
+						Texture2D normalMap = null;
+
+						if (!String.IsNullOrEmpty(bumpMapParameter))
+						{
+							var normalMapPath = Path.Combine("Assets", Path.Combine(DestinationPath, bumpMapParameter + ".tga"));
+
+							normalMap = (Texture2D) AssetDatabase.LoadAssetAtPath(normalMapPath, typeof(Texture2D));
+
+							if (normalMap == null)
+							{
+								Debug.LogWarning(String.Format("Couldn't find normalMap map \"{0}\".", normalMapPath));
+							}
+						}
+
+						var shader = "";
+
+						if (!String.IsNullOrEmpty(translucentParameter) && translucentParameter[0] == '1')
+						{
+							shader += "Transparent/";
+						}
+
+						if (!String.IsNullOrEmpty(bumpMapParameter) && normalMap != null)
+						{
+							shader += "Bumped ";
+						}
+
+						shader += "Diffuse";
+
+						var material = new Material(Shader.Find(shader));
 
 						material.mainTexture = texture;
+
+						if (!String.IsNullOrEmpty(bumpMapParameter) && normalMap != null)
+						{
+							material.SetTexture("_BumpMap", normalMap);
+						}
 
 						var materialPath = Path.Combine(DestinationPath, materialName + ".mat");
 
