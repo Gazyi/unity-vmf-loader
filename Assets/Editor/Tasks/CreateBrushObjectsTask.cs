@@ -1,12 +1,17 @@
 using System.Linq;
+using System.IO;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityVMFLoader.Nodes;
 
 namespace UnityVMFLoader.Tasks
 {
 	[DependsOnTask(typeof(ImportBrushesTask), typeof(GroupNodesTask))]
 	public class CreateBrushObjectsTask : Task
 	{
+		public Dictionary<Solid, GameObject> GameObjects = new Dictionary<Solid, GameObject>();
+
 		public override void Run()
 		{
 			var solids = Importer.GetTask<ImportBrushesTask>().Solids;
@@ -14,22 +19,28 @@ namespace UnityVMFLoader.Tasks
 
 			foreach (var solid in solids)
 			{
+				var mesh = (Mesh) solid;
+
 				var gameObject = new GameObject("Solid " + solid.Identifier);
 
-				gameObject.AddComponent<UnityEngine.MeshRenderer>();
-				gameObject.AddComponent<MeshFilter>();
+				GameObjects[solid] = gameObject;
 
-				gameObject.GetComponent<MeshFilter>().sharedMesh = (Mesh) solid;
+				gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
+
+				var meshRenderer = gameObject.AddComponent<UnityEngine.MeshRenderer>();
 
 				// Assign the placeholder material.
 
-				var material = (Material) AssetDatabase.LoadAssetAtPath("Assets/Materials/dev_measuregeneric01b.mat", typeof(Material));
+				var meshMaterials = new Material[mesh.subMeshCount];
 
-				gameObject.GetComponent<UnityEngine.MeshRenderer>().material = material;
+				for (var i = 0; i < meshMaterials.Length; i++)
+				{
+					meshMaterials[i] = (Material) AssetDatabase.LoadAssetAtPath("Assets/Materials/Dev/dev_measuregeneric01b.mat", typeof(Material));
+				}
+
+				meshRenderer.sharedMaterials = meshMaterials;
 
 				// The vertices of the mesh are in world coordinates so we'll need to center them.
-
-				var mesh = gameObject.GetComponent<MeshFilter>().sharedMesh;
 
 				var center = mesh.vertices.Average();
 

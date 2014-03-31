@@ -25,7 +25,7 @@ namespace UnityVMFLoader.Nodes
 				combines[i++].mesh = (Mesh) side;
 			}
 
-			mesh.CombineMeshes(combines, true, false);
+			mesh.CombineMeshes(combines, false, false);
 			mesh.Optimize();
 
 			if (Settings.GenerateLightmapUVs)
