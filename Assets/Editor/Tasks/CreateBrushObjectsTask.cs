@@ -48,9 +48,7 @@ namespace UnityVMFLoader.Tasks
 
 				gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
 
-				var collider = gameObject.AddComponent<MeshCollider>();
-
-				collider.convex = true;
+				gameObject.AddComponent<MeshCollider>();
 
 				var meshRenderer = gameObject.AddComponent<UnityEngine.MeshRenderer>();
 
