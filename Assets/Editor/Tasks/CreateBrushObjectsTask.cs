@@ -19,28 +19,13 @@ namespace UnityVMFLoader.Tasks
 
 			foreach (var solid in solids)
 			{
-				var mesh = (Mesh) solid;
-
 				var gameObject = new GameObject("Solid " + solid.Identifier);
 
 				GameObjects[solid] = gameObject;
 
-				gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
+				var mesh = (Mesh) solid;
 
-				var meshRenderer = gameObject.AddComponent<UnityEngine.MeshRenderer>();
-
-				// Assign the placeholder material.
-
-				var meshMaterials = new Material[mesh.subMeshCount];
-
-				for (var i = 0; i < meshMaterials.Length; i++)
-				{
-					meshMaterials[i] = (Material) AssetDatabase.LoadAssetAtPath("Assets/Materials/Dev/dev_measuregeneric01b.mat", typeof(Material));
-				}
-
-				meshRenderer.sharedMaterials = meshMaterials;
-
-				// The vertices of the mesh are in world coordinates so we'll need to center them.
+				// The vertices of the mesh are in world coordinates so we'll need to center them ...
 
 				var center = mesh.vertices.Average();
 
@@ -55,19 +40,34 @@ namespace UnityVMFLoader.Tasks
 
 				mesh.RecalculateBounds();
 
-				// And move the object itself to those world coordinates.
+				// ... and move the object itself to those world coordinates.
 
 				gameObject.transform.position = center;
 
-				// In order to make lightmap baking work, make object static.
+				// Add the required components and stuff.
 
-				gameObject.isStatic = true;
-
-				// Add a MeshCollider.
+				gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
 
 				var collider = gameObject.AddComponent<MeshCollider>();
 
 				collider.convex = true;
+
+				var meshRenderer = gameObject.AddComponent<UnityEngine.MeshRenderer>();
+
+				// Assign the placeholder material.
+
+				var meshMaterials = meshRenderer.sharedMaterials;
+
+				for (var i = 0; i < meshMaterials.Length; i++)
+				{
+					meshMaterials[i] = (Material) AssetDatabase.LoadAssetAtPath("Assets/Materials/Dev/dev_measuregeneric01b.mat", typeof(Material));
+				}
+
+				meshRenderer.sharedMaterials = meshMaterials;
+
+				// In order to make lightmap baking work, make object static.
+
+				gameObject.isStatic = true;
 
 				// If the solid is in a group, move it there.
 
