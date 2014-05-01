@@ -26,12 +26,13 @@ namespace UnityVMFLoader.Nodes
 			}
 
 			mesh.CombineMeshes(combines, false, false);
-			mesh.Optimize();
 
 			if (Settings.GenerateLightmapUVs)
 			{
 				Unwrapping.GenerateSecondaryUVSet(mesh);
 			}
+
+			mesh.Optimize();
 
 			return mesh;
 		}
