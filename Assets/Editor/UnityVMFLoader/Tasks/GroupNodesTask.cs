@@ -21,6 +21,7 @@ namespace UnityVMFLoader.Tasks
 			foreach (var group in root.Children.OfType<World>().First().Children.OfType<Group>())
 			{
 				Groups[group] = new GameObject("Group " + group.Identifier);
+				Groups[group].transform.parent = (GameObject.Find("Brushes") ?? new GameObject("Brushes")).transform;
 			}
 
 			base.Run();

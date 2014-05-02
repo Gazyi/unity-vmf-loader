@@ -20,6 +20,7 @@ namespace UnityVMFLoader.Tasks
 			foreach (var solid in solids)
 			{
 				var gameObject = new GameObject("Solid " + solid.Identifier);
+				gameObject.transform.parent = (GameObject.Find("Brushes") ?? new GameObject("Brushes")).transform;
 
 				GameObjects[solid] = gameObject;
 
