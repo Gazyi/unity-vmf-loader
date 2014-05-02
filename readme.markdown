@@ -16,13 +16,13 @@ Planned features:
 *   Draw call optimization
 
 Installation
-============
+------------
 
 Basically just toss everything in the "Assets" folder to the "Assets" folder
 of your project.
 
 Usage
-=====
+-----
 
 1.  Create a new scene or open the scene you want the map to be placed in.
 2.  Drag the VMF file to assets.
