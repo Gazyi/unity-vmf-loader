@@ -9,9 +9,8 @@ Crowbar will be used to accomplish this part.
 Installation
 ============
 
-Installation is a bit weird at the moment. Basically just toss everything in
-the "Assets" to a new folder inside your own "Assets" folder. This will be
-improved in the future.
+Basically just toss everything in the "Assets" folder to the "Assets" folder
+of your project.
 
 Usage
 =====
