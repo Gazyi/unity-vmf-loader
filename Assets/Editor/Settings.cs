@@ -240,7 +240,7 @@ namespace UnityVMFLoader
 			EditorGUILayout.Space();
 		}
 
-		[MenuItem("Unity VMF Loader/Settings")]
+		[MenuItem("Window/Unity VMF Loader")]
 
 		static public void ShowSettings()
 		{
