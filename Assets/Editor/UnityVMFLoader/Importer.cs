@@ -1,6 +1,5 @@
 ﻿using UnityEditor;
 using System;
-using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -8,17 +7,19 @@ namespace UnityVMFLoader
 {
 	public static class Importer
 	{
-		public static List<string> VMFLines;
+		public static string Path
+		{
+			get;
+			private set;
+		}
 
 		public static event EventHandler OnFinished;
 
 		private static List<Task> tasks;
-		private static readonly List<Task> doneTasks;
 
 		static Importer()
 		{
 			tasks = new List<Task>();
-			doneTasks = new List<Task>();
 		}
 
 		public static void AddTask<T>() where T : Task
@@ -28,45 +29,39 @@ namespace UnityVMFLoader
 
 		public static T GetTask<T>() where T : Task
 		{
-			return (T) doneTasks.FirstOrDefault(task => task.GetType() == typeof(T));
+			return (T) tasks.FirstOrDefault(task => task.GetType() == typeof(T));
 		}
 
-		public static bool TaskDone<T>() where T : Task
+		public static Task GetTask(Type taskType)
 		{
-			return TaskDone(typeof(T));
-		}
-
-		public static bool TaskDone(Type type)
-		{
-			return doneTasks.Any(task => task.GetType() == type);
+			return (Task) tasks.FirstOrDefault(task => task.GetType() == taskType);
 		}
 
 		public static void Import(string path)
 		{
+			Path = path;
+
 			UnityThreadHelper.EnsureHelper();
 
-			VMFLines = File.ReadAllLines(path).Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)).ToList();
+			var tasksTotal = (float) tasks.Count;
+			var tasksDone = 0f;
 
-			var taskCount = tasks.Count(x => x.CanRun);
-
-			while (tasks.Any(task => task.CanRun))
+			while (tasks.Any(task => !task.Done && task.CanRun))
 			{
 				foreach (var task in tasks)
 				{
 					if (!task.Done && task.CanRun)
 					{
-						EditorUtility.DisplayProgressBar("Importing VMF", task.GetType().Name, doneTasks.Count() / taskCount);
+						EditorUtility.DisplayProgressBar("Importing VMF", task.GetType().Name, tasksDone / tasksTotal);
 
 						task.Run();
 					}
 
 					if (task.Done)
 					{
-						doneTasks.Add(task);
+						tasksDone++;
 					}
 				}
-
-				tasks = tasks.Where(task => !task.Done).ToList();
 			}
 
 			EditorUtility.ClearProgressBar();
@@ -77,7 +72,6 @@ namespace UnityVMFLoader
 			}
 
 			tasks.Clear();
-			doneTasks.Clear();
 		}
 	}
 }

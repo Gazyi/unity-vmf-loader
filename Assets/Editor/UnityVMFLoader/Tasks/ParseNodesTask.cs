@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Linq;
 using UnityVMFLoader.Nodes;
 
 namespace UnityVMFLoader.Tasks
@@ -12,7 +14,7 @@ namespace UnityVMFLoader.Tasks
 			Root = new Node();
 			var active = Root;
 
-			foreach (var line in Importer.VMFLines)
+			foreach (var line in File.ReadAllLines(Importer.Path).Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)))
 			{
 				var firstCharacter = line[0];
 

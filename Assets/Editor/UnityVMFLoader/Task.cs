@@ -7,11 +7,6 @@ namespace UnityVMFLoader
 {
 	public abstract class Task
 	{
-		public virtual void Run()
-		{
-			Done = true;
-		}
-
 		public bool CanRun
 		{
 			get
@@ -21,7 +16,7 @@ namespace UnityVMFLoader
 					return true;
 				}
 
-				return Dependencies[GetType()].All(Importer.TaskDone);
+				return Dependencies[GetType()].All(task => Importer.GetTask(task).Done);
 			}
 		}
 
@@ -54,6 +49,11 @@ namespace UnityVMFLoader
 
 				Dependencies[taskType] = dependencyAttribute.RequiredTasks.ToList();
 			}
+		}
+
+		public virtual void Run()
+		{
+			Done = true;
 		}
 	}
 }
