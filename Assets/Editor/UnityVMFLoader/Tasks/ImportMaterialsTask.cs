@@ -100,7 +100,7 @@ namespace UnityVMFLoader.Tasks
 					UseShellExecute = false,
 					RedirectStandardOutput = true,
 					RedirectStandardError = true,
-					FileName = Path.Combine(Application.dataPath, "vtf2tga.exe"),
+					FileName = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Application.dataPath, "Editor"), "UnityVMFLoader"), "SourceSDK"), "vtf2tga.exe"),
 					WindowStyle = ProcessWindowStyle.Hidden,
 					Arguments = String.Format("-i \"{0}\" -o \"{1}\"", textureFullPath, textureDestinationFullPath)
 				}
