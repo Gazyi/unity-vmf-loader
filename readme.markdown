@@ -1,10 +1,19 @@
-Import maps created for the [Source
-Engine](http://en.wikipedia.org/wiki/Source_(game_engine)) in
-[Hammer](http://en.wikipedia.org/wiki/Valve_Hammer_Editor) to
-[Unity](http://unity3d.com/). Currently only brush geometry and lights are
-imported, but the plan is to import all assets that the map uses as well –
-everything from textures to models. Existing solutions such as vtf2tga and
-Crowbar will be used to accomplish this part.
+Import maps created in
+[Hammer](http://en.wikipedia.org/wiki/Valve_Hammer_Editor) for the [Source
+Engine](http://en.wikipedia.org/wiki/Source_(game_engine)) to
+[Unity](http://unity3d.com/).
+
+Current features:
+
+*   All brush geometry is imported
+*   Automatic importing of required textures and materials
+*   Light entities
+
+Planned features:
+
+*   Model placeholders
+*   Displacement maps
+*   Draw call optimization
 
 Installation
 ============
