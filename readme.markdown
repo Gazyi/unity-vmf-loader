@@ -8,10 +8,10 @@ Current features:
 *   All brush geometry is imported
 *   Automatic importing of required textures and materials
 *   Light entities
+*   Model placeholders
 
 Planned features:
 
-*   Model placeholders
 *   Displacement maps
 *   Draw call optimization
 
