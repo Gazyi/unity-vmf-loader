@@ -55,6 +55,12 @@ namespace UnityVMFLoader
 			set { EditorPrefs.SetFloat("UnityVMFLoader.LightBrightnessScalar", value); }
 		}
 
+		public static bool ImportProps
+		{
+			get { return EditorPrefs.GetBool("UnityVMFLoader.ImportProps", true); }
+			set { EditorPrefs.SetBool("UnityVMFLoader.ImportProps", value); }
+		}
+
 		public static bool ImportAssets
 		{
 			get { return EditorPrefs.GetBool("UnityVMFLoader.ImportAssets", true); }
@@ -167,6 +173,8 @@ namespace UnityVMFLoader
 			ImportLights = EditorGUILayout.Toggle("Import lights", ImportLights);
 
 			LightBrightnessScalar = EditorGUILayout.Slider("Light brightness scalar", LightBrightnessScalar, 0, 0.02f);
+
+			ImportProps = EditorGUILayout.Toggle("Import props", ImportProps);
 
 			EditorGUILayout.EndToggleGroup();
 
