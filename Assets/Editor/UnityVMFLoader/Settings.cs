@@ -131,6 +131,11 @@ namespace UnityVMFLoader
 		{
 			title = "Unity VMF Loader";
 
+			var size = new Vector2(275, 600);
+
+			minSize = size;
+			maxSize = size;
+
 			// General.
 
 			GUILayout.Label("General", EditorStyles.boldLabel);
