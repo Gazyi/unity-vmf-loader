@@ -284,6 +284,13 @@ namespace UnityVMFLoader.Tasks
 									continue;
 								}
 
+								// Brushes with transparent materials shouldn't ever be occluders.
+
+								if (sideMaterial.shader.ToString().Contains("Transparent"))
+								{
+									GameObjectUtility.SetStaticEditorFlags(gameObject, GameObjectUtility.GetStaticEditorFlags(gameObject) & ~StaticEditorFlags.OccluderStatic);
+								}
+
 								meshMaterials[submesh] = sideMaterial;
 
 								// Minimize shift values.
