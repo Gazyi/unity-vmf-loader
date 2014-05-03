@@ -16,7 +16,7 @@ namespace UnityVMFLoader
 					return true;
 				}
 
-				return Dependencies[GetType()].All(task => Importer.GetTask(task).Done);
+				return Dependencies[GetType()].All(task => Importer.GetTask(task) != null && Importer.GetTask(task).Done);
 			}
 		}
 
