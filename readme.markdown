@@ -1,3 +1,5 @@
+![the importer works flawlessly even on huge maps](screenshot.png)
+
 Import maps created in
 [Hammer](http://en.wikipedia.org/wiki/Valve_Hammer_Editor) for the [Source
 Engine](http://en.wikipedia.org/wiki/Source_(game_engine)) to
