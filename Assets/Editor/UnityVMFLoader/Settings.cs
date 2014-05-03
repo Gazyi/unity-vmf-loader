@@ -170,11 +170,15 @@ namespace UnityVMFLoader
 
 			ImportPointEntities = EditorGUILayout.BeginToggleGroup("Import point entities", ImportPointEntities);
 
-			ImportLights = EditorGUILayout.Toggle("Import lights", ImportLights);
-
-			LightBrightnessScalar = EditorGUILayout.Slider("Light brightness scalar", LightBrightnessScalar, 0, 0.02f);
-
 			ImportProps = EditorGUILayout.Toggle("Import props", ImportProps);
+
+			EditorGUILayout.Space();
+
+			ImportLights = EditorGUILayout.BeginToggleGroup("Import lights", ImportLights);
+
+			LightBrightnessScalar = EditorGUILayout.Slider("Brightness scalar", LightBrightnessScalar, 0, 0.02f);
+
+			EditorGUILayout.EndToggleGroup();
 
 			EditorGUILayout.EndToggleGroup();
 
@@ -184,7 +188,7 @@ namespace UnityVMFLoader
 
 			ImportAssets = EditorGUILayout.BeginToggleGroup("Import assets", ImportAssets);
 
-			GUILayout.Label("Importing assets will import any missing assets that the map uses.", EditorStyles.wordWrappedLabel);
+			GUILayout.Label("Importing assets will import any missing assets that the map uses. Existing assets won't be reimported unless the destination paths are set up incorrectly.", EditorStyles.wordWrappedLabel);
 
 			EditorGUILayout.Space();
 
@@ -200,13 +204,15 @@ namespace UnityVMFLoader
 
 			EditorGUILayout.Space();
 
-			GUILayout.Label("The asset path is the path to the root directory of the game. It will be used to look for the other paths.", EditorStyles.wordWrappedLabel);
+			GUILayout.Label("Source paths:", EditorStyles.boldLabel);
+
+			GUILayout.Label("The root path should point to the same folder that GameInfo.txt is in.", EditorStyles.wordWrappedLabel);
 
 			EditorGUILayout.Space();
 
 			GUILayout.BeginHorizontal();
 
-			AssetPath = EditorGUILayout.TextField("Asset path", AssetPath);
+			AssetPath = EditorGUILayout.TextField("Root", AssetPath);
 
 			if (GUILayout.Button("Browse"))
 			{
@@ -220,31 +226,33 @@ namespace UnityVMFLoader
 
 			GUILayout.EndHorizontal();
 
-			MaterialsFolder = EditorGUILayout.TextField("Materials folder", MaterialsFolder);
+			MaterialsFolder = EditorGUILayout.TextField("Materials", MaterialsFolder);
 
 			old = GUI.enabled;
 			GUI.enabled = false;
 
-			ModelsFolder = EditorGUILayout.TextField("Models folder", ModelsFolder);
-			SoundsFolder = EditorGUILayout.TextField("Sounds folder", SoundsFolder);
+			ModelsFolder = EditorGUILayout.TextField("Models", ModelsFolder);
+			SoundsFolder = EditorGUILayout.TextField("Sounds", SoundsFolder);
 
 			GUI.enabled = old;
 
 			EditorGUILayout.Space();
 
-			GUILayout.Label("The destination asset path is relative to the Assets folder.", EditorStyles.wordWrappedLabel);
+			GUILayout.Label("Destination paths:", EditorStyles.boldLabel);
+
+			GUILayout.Label("The root path is relative to the assets folder. All the other paths are relative to the root path. Can be left empty to use the assets folder as root.", EditorStyles.wordWrappedLabel);
 
 			EditorGUILayout.Space();
 
-			DestinationAssetPath = EditorGUILayout.TextField("Destination asset path", DestinationAssetPath);
+			DestinationAssetPath = EditorGUILayout.TextField("Root", DestinationAssetPath);
 
-			DestinationMaterialsFolder = EditorGUILayout.TextField("Destination materials folder", DestinationMaterialsFolder);
+			DestinationMaterialsFolder = EditorGUILayout.TextField("Materials", DestinationMaterialsFolder);
 
 			old = GUI.enabled;
 			GUI.enabled = false;
 
-			DestinationModelsFolder = EditorGUILayout.TextField("Destination models folder", DestinationModelsFolder);
-			DestinationSoundsFolder = EditorGUILayout.TextField("Destination mounds folder", DestinationSoundsFolder);
+			DestinationModelsFolder = EditorGUILayout.TextField("Models", DestinationModelsFolder);
+			DestinationSoundsFolder = EditorGUILayout.TextField("Sounds", DestinationSoundsFolder);
 
 			GUI.enabled = old;
 
