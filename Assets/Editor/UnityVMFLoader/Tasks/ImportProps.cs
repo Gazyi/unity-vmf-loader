@@ -20,6 +20,8 @@ namespace UnityVMFLoader.Tasks
 
 				propObject.name = "Prop " + prop.Identifier;
 
+				propObject.transform.parent = (GameObject.Find("Props") ?? new GameObject("Props")).transform;
+
 				propObject.transform.position = prop.Origin;
 				propObject.transform.rotation = prop.Angles;
 			}
