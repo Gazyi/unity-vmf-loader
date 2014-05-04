@@ -43,28 +43,33 @@ namespace UnityVMFLoader
 
 			UnityThreadHelper.EnsureHelper();
 
-			var tasksTotal = (float) tasks.Count;
-			var tasksDone = 0f;
-
-			while (tasks.Any(task => !task.Done && task.CanRun))
+			try
 			{
-				foreach (var task in tasks)
+				var tasksTotal = (float) tasks.Count;
+				var tasksDone = 0f;
+
+				while (tasks.Any(task => !task.Done && task.CanRun))
 				{
-					if (!task.Done && task.CanRun)
+					foreach (var task in tasks)
 					{
-						EditorUtility.DisplayProgressBar("Importing VMF", task.GetType().Name, tasksDone / tasksTotal);
+						if (!task.Done && task.CanRun)
+						{
+							EditorUtility.DisplayProgressBar("Importing VMF", task.GetType().Name, tasksDone / tasksTotal);
 
-						task.Run();
-					}
+							task.Run();
+						}
 
-					if (task.Done)
-					{
-						tasksDone++;
+						if (task.Done)
+						{
+							tasksDone++;
+						}
 					}
 				}
 			}
-
-			EditorUtility.ClearProgressBar();
+			finally
+			{
+				EditorUtility.ClearProgressBar();
+			}
 
 			if (OnFinished != null)
 			{
