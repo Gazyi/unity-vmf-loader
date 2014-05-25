@@ -274,7 +274,7 @@ namespace UnityVMFLoader.Nodes
 
 			output.Triangulate(input);
 
-			var renderableOutput = new MeshRenderer.Core.RenderData();
+			var renderableOutput = new TriangleNet.MeshRenderer.Core.RenderData();
 
 			renderableOutput.SetMesh(output);
 
