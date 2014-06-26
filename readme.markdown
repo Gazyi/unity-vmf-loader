@@ -12,8 +12,9 @@ Current features:
 *   Light entities
 *   Model placeholders
 
-Planned features:
+Missing features:
 
+*   Automatic model decompiling and importing
 *   Displacement maps
 *   Draw call optimization
 
