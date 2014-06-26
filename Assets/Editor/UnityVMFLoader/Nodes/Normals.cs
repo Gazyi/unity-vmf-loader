@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 using UnityEngine;
 
 namespace UnityVMFLoader.Nodes
@@ -38,7 +39,7 @@ namespace UnityVMFLoader.Nodes
 			var rowNumber = (int) Char.GetNumericValue(key[3]);
 			var columnNumber = 0;
 
-			var columns = value.Split(' ').Select(v => float.Parse(v)).ToArray();
+			var columns = value.Split(' ').Select(v => float.Parse(v, CultureInfo.InvariantCulture)).ToArray();
 
 			while (columnNumber < columns.Length)
 			{

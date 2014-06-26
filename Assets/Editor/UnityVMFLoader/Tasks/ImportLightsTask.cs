@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Globalization;
 using UnityEngine;
 using UnityVMFLoader.Nodes;
 
@@ -18,8 +19,8 @@ namespace UnityVMFLoader.Tasks
 			{
 				var lightProperties = Regex.Replace(light["_light"], @"\s+", " ").Split(' ');
 
-				var color = lightProperties.Take(3).Select(v => float.Parse(v) / 255f).ToArray();
-				var brightness = float.Parse(lightProperties[3]) * Settings.LightBrightnessScalar;
+				var color = lightProperties.Take(3).Select(v => float.Parse(v, CultureInfo.InvariantCulture) / 255f).ToArray();
+				var brightness = float.Parse(lightProperties[3], CultureInfo.InvariantCulture) * Settings.LightBrightnessScalar;
 
 				var lightObject = new GameObject("Light " + light.Identifier);
 
@@ -43,7 +44,7 @@ namespace UnityVMFLoader.Tasks
 					case "light_spot":
 
 						lightComponent.type = LightType.Spot;
-						lightComponent.spotAngle = int.Parse(light["_cone"]);
+						lightComponent.spotAngle = int.Parse(light["_cone"], CultureInfo.InvariantCulture);
 
 						break;
 				}

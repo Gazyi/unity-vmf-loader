@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 using UnityEngine;
 
 namespace UnityVMFLoader.Nodes
@@ -20,7 +21,7 @@ namespace UnityVMFLoader.Nodes
 			{
 				case "power":
 
-					Power = int.Parse(value);
+					Power = int.Parse(value, CultureInfo.InvariantCulture);
 
 					if (Power < 2 || Power > 4)
 					{
@@ -33,7 +34,7 @@ namespace UnityVMFLoader.Nodes
 
 				case "startposition":
 
-					var origin = value.Trim('[', ']').Split(' ').Select(v => float.Parse(v)).ToArray();
+					var origin = value.Trim('[', ']').Split(' ').Select(v => float.Parse(v, CultureInfo.InvariantCulture)).ToArray();
 
 					Origin = new Vector3(origin[0], origin[1], origin[2]).SourceToUnity();
 
@@ -41,7 +42,7 @@ namespace UnityVMFLoader.Nodes
 
 				case "elevation":
 
-					Elevation = float.Parse(value);
+					Elevation = float.Parse(value, CultureInfo.InvariantCulture);
 
 					break;
 			}

@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 using Mesh = UnityEngine.Mesh;
 
@@ -69,23 +70,23 @@ namespace UnityVMFLoader.Nodes
 
 					PointA = new Vector3
 					(
-						float.Parse(match.Groups[1].Value),
-						float.Parse(match.Groups[2].Value),
-						float.Parse(match.Groups[3].Value)
+						float.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture),
+						float.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture),
+						float.Parse(match.Groups[3].Value, CultureInfo.InvariantCulture)
 					);
 
 					PointB = new Vector3
 					(
-						float.Parse(match.Groups[4].Value),
-						float.Parse(match.Groups[5].Value),
-						float.Parse(match.Groups[6].Value)
+						float.Parse(match.Groups[4].Value, CultureInfo.InvariantCulture),
+						float.Parse(match.Groups[5].Value, CultureInfo.InvariantCulture),
+						float.Parse(match.Groups[6].Value, CultureInfo.InvariantCulture)
 					);
 
 					PointC = new Vector3
 					(
-						float.Parse(match.Groups[7].Value),
-						float.Parse(match.Groups[8].Value),
-						float.Parse(match.Groups[9].Value)
+						float.Parse(match.Groups[7].Value, CultureInfo.InvariantCulture),
+						float.Parse(match.Groups[8].Value, CultureInfo.InvariantCulture),
+						float.Parse(match.Groups[9].Value, CultureInfo.InvariantCulture)
 					);
 
 					if (PointA.magnitude > 16384 || PointB.magnitude > 16384 || PointC.magnitude > 16384)
@@ -139,13 +140,13 @@ namespace UnityVMFLoader.Nodes
 
 					UAxis = new Vector3
 					(
-						float.Parse(match.Groups[1].Value),
-						float.Parse(match.Groups[3].Value),
-						float.Parse(match.Groups[2].Value)
+						float.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture),
+						float.Parse(match.Groups[3].Value, CultureInfo.InvariantCulture),
+						float.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture)
 					);
 
-					UAxisTranslation = float.Parse(match.Groups[4].Value);
-					UAxisScale = float.Parse(match.Groups[5].Value) * inchesInMeters;
+					UAxisTranslation = float.Parse(match.Groups[4].Value, CultureInfo.InvariantCulture);
+					UAxisScale = float.Parse(match.Groups[5].Value, CultureInfo.InvariantCulture) * inchesInMeters;
 
 					break;
 
@@ -160,19 +161,19 @@ namespace UnityVMFLoader.Nodes
 
 					VAxis = new Vector3
 					(
-						float.Parse(match.Groups[1].Value),
-						float.Parse(match.Groups[3].Value),
-						float.Parse(match.Groups[2].Value)
+						float.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture),
+						float.Parse(match.Groups[3].Value, CultureInfo.InvariantCulture),
+						float.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture)
 					);
 
-					VAxisTranslation = float.Parse(match.Groups[4].Value);
-					VAxisScale = float.Parse(match.Groups[5].Value) * inchesInMeters;
+					VAxisTranslation = float.Parse(match.Groups[4].Value, CultureInfo.InvariantCulture);
+					VAxisScale = float.Parse(match.Groups[5].Value, CultureInfo.InvariantCulture) * inchesInMeters;
 
 					break;
 
 				case "rotation":
 
-					Rotation = float.Parse(value);
+					Rotation = float.Parse(value, CultureInfo.InvariantCulture);
 
 					break;
 			}

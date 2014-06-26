@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 using UnityEngine;
 
 namespace UnityVMFLoader.Nodes
@@ -32,7 +33,7 @@ namespace UnityVMFLoader.Nodes
 
 				case "angles":
 
-					var axis = value.Split(' ').Select(v => float.Parse(v)).ToArray();
+					var axis = value.Split(' ').Select(v => float.Parse(v, CultureInfo.InvariantCulture)).ToArray();
 
 					Angles = Quaternion.Euler(-axis[0], -axis[1] + 90, axis[2]);
 
@@ -40,7 +41,7 @@ namespace UnityVMFLoader.Nodes
 
 				case "pitch":
 
-					var pitch = -float.Parse(value);
+					var pitch = -float.Parse(value, CultureInfo.InvariantCulture);
 
 					if (pitch != 0)
 					{
@@ -51,7 +52,7 @@ namespace UnityVMFLoader.Nodes
 
 				case "origin":
 
-					var origin = value.Split(' ').Select(v => float.Parse(v)).ToArray();
+					var origin = value.Split(' ').Select(v => float.Parse(v, CultureInfo.InvariantCulture)).ToArray();
 
 					Origin = new Vector3(origin[0], origin[1], origin[2]).SourceToUnity();
 
