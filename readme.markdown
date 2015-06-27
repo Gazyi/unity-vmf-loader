@@ -3,7 +3,8 @@
 Import maps created in
 [Hammer](http://en.wikipedia.org/wiki/Valve_Hammer_Editor) for the [Source
 Engine](http://en.wikipedia.org/wiki/Source_(game_engine)) to
-[Unity](http://unity3d.com/).
+[Unity](http://unity3d.com/). Importer only works on Windows for now. It's
+licensed under the liberal [zlib license](license.markdown).
 
 Current features:
 
